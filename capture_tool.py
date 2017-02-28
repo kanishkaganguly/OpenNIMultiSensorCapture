@@ -69,7 +69,7 @@ def get_ir():
 	frame_data = frame.get_buffer_as_uint16()
 	ir_array = np.ndarray((frame.height, frame.width),dtype=np.uint16,buffer=frame_data).astype(np.float32)
 	if use_display:
-		cv2.imshow('IR',ir_array)
+		cv2.imshow('IR',ir_array / ir_array.max ())
 def get_depth():
 	global depth_array, use_display
 	frame = depth_stream.read_frame()
@@ -95,7 +95,7 @@ def save_frame(frame_type, frame_array, idx):
 	if frame_type is 'rgb':
 		cv2.imwrite(fn, (rgb_array).astype(np.uint8))
 	if frame_type is 'ir':
-		cv2.imwrite(fn, ir_array.astype(np.uint8))
+		cv2.imwrite(fn, (ir_array/ir_array.max()*255).astype(np.uint8))
 	if frame_type is 'depth':
 		cv2.imwrite(fn, depth_array.astype(np.uint16))
 
@@ -192,7 +192,8 @@ def main():
 	''' Stop and quit '''
 	openni2.unload()
 	cv2.destroyAllWindows()
-	print "Saved %d files to disk"%(shot_idx)
+	if save_cap:
+		print "Saved %d files to disk"%(shot_idx)
 
 if __name__ == '__main__':
 	main()
